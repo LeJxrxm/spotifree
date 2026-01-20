@@ -34,7 +34,9 @@ RUN pip3 install --upgrade pip \
 
 
 ARG DATABASE_URL
+ARG CORS_ALLOW_ORIGIN
 ENV DATABASE_URL=${DATABASE_URL}
+ENV CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN}
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
