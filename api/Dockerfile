@@ -70,7 +70,10 @@ RUN composer install --no-dev --optimize-autoloader --classmap-authoritative --n
 
 
 # Permissions
-RUN mkdir -p var && chown -R www-data:www-data var && chmod -R 775 var
+RUN mkdir -p var/cache var/log \
+ && chown -R www-data:www-data var \
+ && chmod -R 775 var
+
 
 
 # Entrypoint
