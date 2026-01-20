@@ -48,6 +48,9 @@ ARG APP_ENV=prod
 # Copy composer files
 COPY composer.json composer.lock symfony.lock ./
 
+# Create empty .env file to avoid errors if not provided
+RUN touch .env
+
 # Install dependencies (include dev to avoid crashes if switched to dev mode)
 RUN composer install --optimize-autoloader --no-scripts --no-progress
 

@@ -113,7 +113,7 @@ export default defineNuxtConfig({
     public: {
       // Pour iOS/Capacitor, utiliser l'IP locale de votre machine (ex: http://192.168.1.X:8000)
       // Définissez NUXT_PUBLIC_API_BASE dans .env ou variables d'environnement
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || "http://192.168.1.10:8000",
+      apiBase: ''
     },
   },
 
