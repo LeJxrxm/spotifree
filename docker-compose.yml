@@ -1,0 +1,76 @@
+services:
+  database:
+    image: mariadb:10.11
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    restart: always
+    container_name: api
+    command: /bin/sh -c "php bin/console doctrine:migrations:migrate --no-interaction && php-fpm"
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      APP_ENV: ${APP_ENV:-prod}
+      APP_SECRET: ${APP_SECRET}
+      DATABASE_URL: mysql://${DB_USER}:${DB_PASSWORD}@database:3306/${DB_NAME}?serverVersion=10.11.2-MariaDB&charset=utf8mb4
+      # CORS_ALLOW_ORIGIN: ^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$
+    volumes:
+      - ./api/public/uploads:/var/www/symfony/public/uploads
+      # Uncomment below for local dev to sync code
+      # - ./api:/var/www/symfony
+    networks:
+      - app_network
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    depends_on:
+      - api
+    volumes:
+      - ./api/public:/var/www/symfony/public:ro
+      - ./api/docker/nginx/conf.d:/etc/nginx/conf.d:ro
+    ports:
+      - "8000:80"
+    networks:
+      - app_network
+
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      NUXT_HOST: 0.0.0.0
+      NUXT_PORT: 3000
+      NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-http://localhost:8000}
+    ports:
+      - "3000:3000"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  db_data:

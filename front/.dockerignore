@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.output/
+.nuxt/
+dist/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Cache & logs
+.cache/
+*.log
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Documentation
+README.md
+*.md
+
+# Tests
+/tests/
+/test/
+*.test.ts
+*.spec.ts
+
+# Development only
+.eslintrc*
+eslint.config.mjs
+tsconfig.json
+renovate.json
+pnpm-workspace.yaml
+
+# iOS/Capacitor
+CAPACITOR_IOS_SETUP.md
+PWA_IOS_SETUP.md
+SPLASH_SCREEN_SETUP.md

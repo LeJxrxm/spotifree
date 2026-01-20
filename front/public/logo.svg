@@ -1,0 +1,47 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#000000"/>
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Vinyl Record Circle -->
+  <circle cx="512" cy="512" r="320" fill="url(#gradient)" opacity="0.1"/>
+  <circle cx="512" cy="512" r="280" fill="none" stroke="url(#gradient)" stroke-width="4"/>
+  <circle cx="512" cy="512" r="240" fill="none" stroke="url(#gradient)" stroke-width="2" opacity="0.5"/>
+  <circle cx="512" cy="512" r="200" fill="none" stroke="url(#gradient)" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Center Circle -->
+  <circle cx="512" cy="512" r="80" fill="url(#gradient)"/>
+  <circle cx="512" cy="512" r="40" fill="#000000"/>
+  
+  <!-- Musical Note -->
+  <g transform="translate(512, 512)">
+    <!-- Note stem -->
+    <rect x="60" y="-160" width="16" height="200" rx="8" fill="url(#gradient)"/>
+    
+    <!-- Note head -->
+    <ellipse cx="60" cy="50" rx="45" ry="35" fill="url(#gradient)"/>
+    
+    <!-- Flag -->
+    <path d="M76 -160 Q140 -140 140 -80 Q140 -40 100 -20" 
+          fill="url(#gradient)" opacity="0.8"/>
+  </g>
+  
+  <!-- Decorative Wave Lines -->
+  <path d="M 200 512 Q 280 480 360 512 T 520 512" 
+        stroke="url(#gradient)" stroke-width="3" fill="none" opacity="0.3"/>
+  <path d="M 664 512 Q 744 480 824 512" 
+        stroke="url(#gradient)" stroke-width="3" fill="none" opacity="0.3"/>
+  
+  <!-- Text (Optional - can be removed) -->
+  <text x="512" y="880" font-family="Arial, sans-serif" font-size="64" font-weight="bold" 
+        fill="url(#gradient)" text-anchor="middle">
+    BackingTracks
+  </text>
+</svg>

@@ -1,0 +1,35 @@
+# Secrets générés
+deployment-secrets-*.txt
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Docker
+docker-compose.override.yml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Backups
+*.sql
+*.sql.gz
+backups/
