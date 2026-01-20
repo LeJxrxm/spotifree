@@ -62,8 +62,8 @@ RUN composer install --optimize-autoloader --no-scripts --no-progress
 COPY . .
 
 # Run composer post-install scripts
-RUN composer dump-autoload --optimize --classmap-authoritative \
-    && composer run-script post-install-cmd
+RUN composer install --no-dev --optimize-autoloader --classmap-authoritative --no-scripts
+
 
 # Permissions
 RUN chown -R www-data:www-data var && chmod -R 777 var
@@ -72,4 +72,7 @@ RUN chown -R www-data:www-data var && chmod -R 777 var
 COPY bin/console /var/www/symfony/bin/console
 RUN chmod +x /var/www/symfony/bin/console
 
-CMD ["php-fpm"]
+CMD php bin/console cache:clear --env=prod && \
+    php bin/console cache:warmup --env=prod && \
+    php-fpm
+
