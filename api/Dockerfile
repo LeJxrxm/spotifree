@@ -36,9 +36,16 @@ RUN pip3 install --upgrade pip \
 ARG DATABASE_URL
 ARG CORS_ALLOW_ORIGIN
 ARG DEFAULT_URI
+ARG JWT_SECRET_KEY
+ARG JWT_PUBLIC_KEY
+ARG JWT_PASSPHRASE
+
 ENV DATABASE_URL=${DATABASE_URL}
 ENV CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN}
 ENV DEFAULT_URI=${DEFAULT_URI}
+ENV JWT_SECRET_KEY="%kernel.project_dir%/config/jwt/private.pem"
+ENV JWT_PUBLIC_KEY="%kernel.project_dir%/config/jwt/public.pem"
+ENV JWT_PASSPHRASE=${JWT_PASSPHRASE}
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
