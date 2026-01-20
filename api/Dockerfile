@@ -20,10 +20,10 @@ RUN apk add --no-cache \
 # Install PHP extensions
 RUN docker-php-ext-configure intl \
     && docker-php-ext-install \
-        intl \
-        opcache \
-        pdo_mysql \
-        zip
+    intl \
+    opcache \
+    pdo_mysql \
+    zip
 
 # Install yt-dlp via pip (apk package might be outdated or missing)
 # Create a virtual environment for python tools to avoid breaking system packages
@@ -31,6 +31,10 @@ RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip3 install --upgrade pip \
     && pip3 install yt-dlp
+
+
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
