@@ -65,22 +65,11 @@ RUN composer install --optimize-autoloader --no-scripts --no-progress
 # Copy application source
 COPY . .
 
-# Run composer post-install scripts
 RUN composer install --no-dev --optimize-autoloader --classmap-authoritative --no-scripts
 
 
-# Permissions
-RUN mkdir -p var/cache var/log \
- && chown -R www-data:www-data var \
- && chmod -R 775 var
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-
-
-# Entrypoint
-COPY bin/console /var/www/symfony/bin/console
-RUN chmod +x /var/www/symfony/bin/console
-
-CMD php bin/console cache:clear --env=prod && \
-    php bin/console cache:warmup --env=prod && \
-    php-fpm
+ENTRYPOINT ["/entrypoint.sh"]
 
