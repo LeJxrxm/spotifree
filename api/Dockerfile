@@ -66,7 +66,8 @@ RUN composer install --no-dev --optimize-autoloader --classmap-authoritative --n
 
 
 # Permissions
-RUN chown -R www-data:www-data var && chmod -R 777 var
+RUN mkdir -p var && chown -R www-data:www-data var && chmod -R 775 var
+
 
 # Entrypoint
 COPY bin/console /var/www/symfony/bin/console
