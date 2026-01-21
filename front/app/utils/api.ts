@@ -6,9 +6,13 @@ const api = {
     const token = useCookie("token").value;
 
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
       ...options.headers,
     };
+
+    // Only set Content-Type if not FormData (browser sets it automatically for FormData)
+    if (!(options.body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
 
     if (token && !headers.Authorization) {
       headers.Authorization = `Bearer ${token}`;
