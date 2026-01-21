@@ -1,0 +1,15 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies first (will be cached if package.json doesn't change)
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the application (will use mounted volume in dev)
+COPY . .
+
+EXPOSE 3000
+
+# Command will be overridden by docker-compose
+CMD ["npm", "run", "dev"]

@@ -36,7 +36,7 @@ const { data: albums } = await useAsyncData<Album[]>('albums', () => api.get('/a
 const sections = computed(() => {
   const list = []
 
-  if (artists.value && artists.value.length > 0) {
+  if (artists.value && Array.isArray(artists.value) && artists.value.length > 0) {
     list.push({
       title: 'Artists',
       items: artists.value.map((a: Artiste) => ({
@@ -48,7 +48,7 @@ const sections = computed(() => {
     })
   }
 
-  if (albums.value && albums.value.length > 0) {
+  if (albums.value && Array.isArray(albums.value) && albums.value.length > 0) {
     list.push({
       title: 'All Albums',
       items: albums.value.map((album: Album) => ({
@@ -70,8 +70,7 @@ const sections = computed(() => {
     <section v-for="section in sections" :key="section.title">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-2xl font-bold hover:underline cursor-pointer">{{ section.title }}</h2>
-        <UButton variant="link" color="neutral"
-          class="text-sm font-bold uppercase tracking-wider hover:underline text-neutral-400">Show all</UButton>
+        <UButton variant="link" color="neutral" class="text-sm font-bold uppercase tracking-wider hover:underline text-neutral-400">Show all</UButton>
       </div>
 
       <UCarousel
@@ -80,8 +79,7 @@ const sections = computed(() => {
         :ui="{
           item: 'basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6',
           container: 'gap-6'
-        }"
-      >
+        }">
         <MusicCard v-bind="item" />
       </UCarousel>
     </section>

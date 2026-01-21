@@ -66,13 +66,11 @@ COPY composer.json composer.lock symfony.lock ./
 # Create empty .env file to avoid errors if not provided
 RUN touch .env
 
-# Install dependencies (include dev to avoid crashes if switched to dev mode)
+# Install dependencies (with dev dependencies for development)
 RUN composer install --optimize-autoloader --no-scripts --no-progress
 
 # Copy application source
 COPY . .
-
-RUN composer install --no-dev --optimize-autoloader --classmap-authoritative --no-scripts
 
 
 COPY entrypoint.sh /entrypoint.sh

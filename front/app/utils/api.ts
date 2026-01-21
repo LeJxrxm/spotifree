@@ -88,4 +88,4 @@ const prefixApiResource = (path: string) => {
 };
 
 export default api;
-export {prefixApiResource}
+export { prefixApiResource };

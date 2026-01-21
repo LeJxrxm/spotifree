@@ -1,0 +1,28 @@
+services:
+  # Override front service for development with hot reload
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile.dev
+    command: npm run dev
+    environment:
+      NUXT_HOST: 0.0.0.0
+      NUXT_PORT: 3000
+      NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE}
+    volumes:
+      # Mount source code for hot reload
+      - ./front:/app
+      # Exclude node_modules to avoid conflicts
+      - /app/node_modules
+      - /app/.nuxt
+    stdin_open: true
+    tty: true
+
+  # Override API for development (optional)
+  api:
+    environment:
+      APP_ENV: dev
+    volumes:
+      - ./api:/var/www/symfony
+      - /var/www/symfony/vendor
+      - /var/www/symfony/var

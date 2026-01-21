@@ -22,6 +22,19 @@ export const useAuthStore = defineStore("auth", () => {
     return !!token.value;
   });
 
+  const register = async (data: { email: string; password: string; username: string }) => {
+    loading.value = true;
+    try {
+      await api.post("/api/register", data);
+      return navigateTo("/auth/login");
+    } catch (error) {
+      console.error("Registration failed:", error);
+      throw error;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const login = async (credentials: { email: string; password: string }) => {
     loading.value = true;
     try {
@@ -68,5 +81,6 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     fetchUser,
     logout,
+    register,
   };
 });
