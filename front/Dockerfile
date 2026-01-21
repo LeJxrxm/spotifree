@@ -11,6 +11,8 @@ RUN npm install
 COPY . .
 
 # Build application
+ARG NUXT_PUBLIC_API_BASE
+ENV NUXT_PUBLIC_API_BASE=${NUXT_PUBLIC_API_BASE}
 RUN npm run build
 
 # Runner stage
@@ -23,8 +25,6 @@ WORKDIR /app
 COPY --from=builder /app/.output ./.output
 
 # Environment variables
-ARG NUXT_PUBLIC_API_BASE
-ENV NUXT_PUBLIC_API_BASE=${NUXT_PUBLIC_API_BASE}
 ENV NUXT_HOST=0.0.0.0
 ENV NUXT_PORT=3000
 ENV NODE_ENV=production
