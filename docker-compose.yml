@@ -38,7 +38,7 @@ services:
       JWT_PASSPHRASE: ${JWT_PASSPHRASE}
       # CORS_ALLOW_ORIGIN: ^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$
     volumes:
-      - ./api/public/uploads:/var/www/symfony/public/uploads
+      - uploads_data:/var/www/symfony/public/uploads
       # Uncomment below for local dev to sync code
       # - ./api:/var/www/symfony
     networks:
@@ -50,7 +50,7 @@ services:
     depends_on:
       - api
     volumes:
-      - ./api/public:/var/www/symfony/public:ro
+      - uploads_data:/var/www/symfony/public/uploads:ro
       - ./api/docker/nginx/conf.d:/etc/nginx/conf.d:ro
     ports:
       - "${NGINX_PORT:-80}:80"
@@ -77,3 +77,4 @@ networks:
 
 volumes:
   db_data:
+  uploads_data:
