@@ -49,6 +49,7 @@ class AudioUploader
             '--print', 'title', // Get video title
             '--print', 'duration', // Get duration in seconds
             '--no-playlist',
+            '--js-runtimes', 'node',
             $youtubeUrl
         ]);
 
