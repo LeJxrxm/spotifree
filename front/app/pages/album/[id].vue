@@ -37,7 +37,7 @@ const albumYear = computed(() => {
 
 // Extract dominant color from cover
 const { extractDominantColor } = useDominantColor()
-const dominantColor = ref('primary') // default red
+const dominantColor = ref('rgb(82, 82, 91)') // default gray
 
 onMounted(async () => {
     const imageUrl = prefixApiResource(album.value?.coverUrl || album.value?.artiste?.imageUrl || '')
