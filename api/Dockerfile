@@ -33,19 +33,12 @@ RUN pip3 install --upgrade pip \
     && pip3 install yt-dlp
 
 
-ARG DATABASE_URL
-ARG CORS_ALLOW_ORIGIN
-ARG DEFAULT_URI
-ARG JWT_SECRET_KEY
-ARG JWT_PUBLIC_KEY
-ARG JWT_PASSPHRASE
-
-ENV DATABASE_URL=${DATABASE_URL}
-ENV CORS_ALLOW_ORIGIN=${CORS_ALLOW_ORIGIN}
-ENV DEFAULT_URI=${DEFAULT_URI}
+# JWT key paths (static filesystem paths, not secrets)
 ENV JWT_SECRET_KEY="%kernel.project_dir%/config/jwt/private.pem"
 ENV JWT_PUBLIC_KEY="%kernel.project_dir%/config/jwt/public.pem"
-ENV JWT_PASSPHRASE=${JWT_PASSPHRASE}
+# All other env vars (DATABASE_URL, CORS_ALLOW_ORIGIN, DEFAULT_URI,
+# JWT_PASSPHRASE, APP_SECRET) are provided at runtime by docker-compose.
+# Never bake secrets into the image as build args.
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
