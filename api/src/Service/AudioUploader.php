@@ -5,18 +5,33 @@ namespace App\Service;
 use FFMpeg\FFMpeg;
 use FFMpeg\Format\Audio\DefaultAudio;
 use FFMpeg\Format\Video\Ogg;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
-class AudioUploader
+class AudioUploader extends AbstractFileUploader
 {
-    public function __construct(
-        private SluggerInterface $slugger,
-        #[Autowire('%kernel.project_dir%')] private string $projectDir
-    ) {}
+    /**
+     * Allowed MIME types for audio uploads (whitelist)
+     */
+    private const ALLOWED_AUDIO_MIME_TYPES = [
+        'audio/mpeg',           // MP3
+        'audio/mp3',            // MP3 (alternative)
+        'audio/wav',            // WAV
+        'audio/wave',           // WAV (alternative)
+        'audio/x-wav',          // WAV (alternative)
+        'audio/ogg',            // OGG
+        'audio/opus',           // OPUS
+        'audio/flac',           // FLAC
+        'audio/x-flac',         // FLAC (alternative)
+        'audio/aac',            // AAC
+        'audio/x-aac',          // AAC (alternative)
+        'audio/m4a',            // M4A
+        'audio/x-m4a',          // M4A (alternative)
+        'audio/mp4',            // MP4 audio
+        'audio/webm',           // WebM audio
+        'audio/x-ms-wma',       // WMA
+    ];
 
     /**
      * Download audio from YouTube URL and convert to opus
@@ -97,6 +112,9 @@ class AudioUploader
      */
     public function uploadAndConvert(UploadedFile $file): string
     {
+        // Validate MIME type against whitelist
+        $this->validateMimeType($file, self::ALLOWED_AUDIO_MIME_TYPES);
+
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFilename = $this->slugger->slug($originalFilename);
         $newFilename = $safeFilename . '-' . uniqid() . '.opus';
