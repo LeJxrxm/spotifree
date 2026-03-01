@@ -18,6 +18,10 @@ export const usePlayerStore = defineStore("player", () => {
     isPlaying.value = !isPlaying.value;
   }
 
+  function setVolume(vol: number): void {
+    volume.value = vol;
+  }
+
   return {
     currentTrack,
     isPlaying,
@@ -25,5 +29,6 @@ export const usePlayerStore = defineStore("player", () => {
     play,
     pause,
     togglePlay,
+    setVolume,
   };
 });

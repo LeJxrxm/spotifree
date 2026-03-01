@@ -28,7 +28,7 @@ class MusiqueController extends AbstractController
     public function index(MusiqueRepository $musiqueRepository, Request $request): JsonResponse
     {
         $search = $request->query->get('search');
-        
+
         if ($search) {
             $musiques = $musiqueRepository->createQueryBuilder('m')
                 ->where('LOWER(m.titre) LIKE LOWER(:search)')
@@ -98,19 +98,19 @@ class MusiqueController extends AbstractController
         } catch (\Exception $e) {
             return $this->json(['message' => 'Processing failed: ' . $e->getMessage()], 500);
         }
-        
+
         // 4. Create Musique
         if (!$titre) {
             $titre = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         }
-        
+
         $musique = new Musique();
         $musique->setTitre($titre);
         $musique->setAudioUrl($audioUrl);
-        
+
         // Get duration (Mock logic for now, or need getid3 lib)
-        $musique->setDuree(0); 
-        
+        $musique->setDuree(0);
+
         // 1. Handle Artiste
         $artiste = null;
         if ($artisteInput) {
@@ -119,7 +119,7 @@ class MusiqueController extends AbstractController
             } else {
                 $artiste = $artisteRepository->findOneBy(['nom' => $artisteInput]);
             }
-            
+
             if (!$artiste && is_string($artisteInput)) {
                 // Create new Artiste
                 $artiste = new Artiste();
@@ -130,7 +130,7 @@ class MusiqueController extends AbstractController
             }
         }
         if ($artiste) {
-             $musique->setArtiste($artiste);
+            $musique->setArtiste($artiste);
         }
 
         // 2. Handle Album
@@ -150,7 +150,7 @@ class MusiqueController extends AbstractController
                 $album->setCoverUrl('https://placehold.co/400?text=' . urlencode($albumInput));
                 $entityManager->persist($album);
             }
-             if ($album) {
+            if ($album) {
                 $musique->setAlbum($album);
             }
         }
@@ -185,15 +185,15 @@ class MusiqueController extends AbstractController
         try {
             // Download from YouTube
             $downloadResult = $audioUploader->downloadFromYouTube($youtubeUrl);
-            
+
             // Use provided title or fallback to YouTube title
             $finalTitle = $titre ?: $downloadResult['title'];
-            
+
             $musique = new Musique();
             $musique->setTitre($finalTitle);
             $musique->setAudioUrl($downloadResult['audioUrl']);
             $musique->setDuree($downloadResult['duration']);
-            
+
             // Handle Artiste
             $artiste = null;
             if ($artisteInput) {
@@ -202,7 +202,7 @@ class MusiqueController extends AbstractController
                 } else {
                     $artiste = $artisteRepository->findOneBy(['nom' => $artisteInput]);
                 }
-                
+
                 if (!$artiste && is_string($artisteInput)) {
                     $artiste = new Artiste();
                     $artiste->setNom($artisteInput);
@@ -244,7 +244,6 @@ class MusiqueController extends AbstractController
                 'title' => $finalTitle,
                 'duration' => $downloadResult['duration']
             ], 201);
-            
         } catch (\InvalidArgumentException $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         } catch (\Exception $e) {
@@ -278,7 +277,7 @@ class MusiqueController extends AbstractController
             } else {
                 $artiste = $artisteRepository->findOneBy(['nom' => $artisteInput]);
             }
-            
+
             if (!$artiste && is_string($artisteInput)) {
                 // Create new Artiste
                 $artiste = new Artiste();
@@ -323,7 +322,7 @@ class MusiqueController extends AbstractController
     /**
      * Allow the user to save their volume preference for a given Musique entity
      */
-    #[Route('/api/musiques/{id}/volume', name: 'api_musiques_update_volume', methods: ['PATCH'])]
+    #[Route('/api/musiques/{id}/preferences', name: 'api_musiques_update_preferences', methods: ['PATCH'])]
     public function updateVolume(Musique $musique, Request $request, EntityManagerInterface $entityManager, #[CurrentUser] User $user): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -354,6 +353,20 @@ class MusiqueController extends AbstractController
             'id' => $musique->getId(),
             'message' => 'Volume preference saved successfully',
             'volume' => $volume
+        ]);
+    }
+
+    #[Route('/api/musiques/{id}/preferences', name: 'api_musiques_get_preferences', methods: ['GET'])]
+    public function getVolume(Musique $musique, EntityManagerInterface $entityManager, #[CurrentUser] User $user): JsonResponse
+    {
+        $musiqueUser = $entityManager->getRepository(MusiqueUser::class)->findOneBy([
+            'musique' => $musique,
+            'user' => $user,
+        ]);
+
+        return $this->json([
+            'id' => $musique->getId(),
+            'volume' => $musiqueUser ? $musiqueUser->getVolume() : null, // Default volume is 1 (max)
         ]);
     }
 }

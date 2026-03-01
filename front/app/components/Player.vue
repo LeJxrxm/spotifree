@@ -12,13 +12,6 @@ const currentTime = ref(0)
 const duration = ref(0)
 const progress = ref(0) // 0-100
 
-// Helper to normalize URLs
-const getResourceUrl = (path: string | undefined) => {
-  if (!path) return ''
-  if (path.startsWith('http')) return path
-  return prefixApiResource(path)
-}
-
 const getTrackImage = (track: Musique | null) => {
     if (!track) return ''
     // Try album cover, then artist image, then nothing
@@ -30,8 +23,19 @@ watch(currentTrack, async (newTrack) => {
   if (newTrack) {
     await nextTick()
     if (audioPlayer.value) {
-      audioPlayer.value.src = getResourceUrl(newTrack.audioUrl)
+      audioPlayer.value.src = prefixApiResource(newTrack.audioUrl)
       audioPlayer.value.load()
+
+      // Get saved volume preference for this track
+      try{
+        const { volume: v } = await api.get(`/api/musiques/${newTrack.id}/preferences`) as  { volume: number };
+        if (typeof v === 'number') {
+          playerStore.setVolume(v);
+          volume.value = v; // Update local ref to reflect stored preference
+        }
+      }catch(e){
+        console.error("Failed to load volume preference", e)
+      }
       
       // Mise à jour Media Session pour écran verrouillé
       updateMediaSession(newTrack)
@@ -60,6 +64,10 @@ watch(isPlaying, async (playing) => {
 watch(volume, (vol) => {
   if (audioPlayer.value) {
     audioPlayer.value.volume = vol
+    api
+      .patch(`/api/musiques/${currentTrack.value?.id}/preferences`, { volume: vol })
+      .catch(e => console.error("Failed to save volume preference", e))
+    ;
   }
 })
 
@@ -153,9 +161,9 @@ onUnmounted(() => {
       <!-- Track Info + Controls -->
       <div class="flex items-center gap-3">
         <NuxtLink v-if="currentTrack.album?.id" :to="`/album/${currentTrack.album.id}`" class="flex-shrink-0">
-          <img :src="getResourceUrl(getTrackImage(currentTrack))" alt="Album Art" class="w-12 h-12 object-cover rounded shadow-md hover:scale-105 transition-transform" />
+          <img :src="prefixApiResource(getTrackImage(currentTrack))" alt="Album Art" class="w-12 h-12 object-cover rounded shadow-md hover:scale-105 transition-transform" />
         </NuxtLink>
-        <img v-else :src="getResourceUrl(getTrackImage(currentTrack))" alt="Album Art" class="w-12 h-12 object-cover rounded shadow-md flex-shrink-0" />
+        <img v-else :src="prefixApiResource(getTrackImage(currentTrack))" alt="Album Art" class="w-12 h-12 object-cover rounded shadow-md flex-shrink-0" />
         
         <div class="flex flex-col min-w-0 flex-1">
           <h3 class="text-sm font-semibold truncate">{{ currentTrack.titre }}</h3>
@@ -166,7 +174,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Controls -->
-        <div class="flex items-center gap-2 flex-shrink-0">
+        <div class="flex items-center gap-2 shrink-0">
           <UButton 
             :icon="isPlaying ? 'i-lucide-pause' : 'i-lucide-play'" 
             variant="ghost" 
@@ -184,9 +192,9 @@ onUnmounted(() => {
       <!-- Left: Track Info -->
       <div class="flex items-center gap-4 min-w-0">
         <NuxtLink v-if="currentTrack.album?.id" :to="`/album/${currentTrack.album.id}`">
-          <img :src="getResourceUrl(getTrackImage(currentTrack))" alt="Album Art" class="w-14 h-14 object-cover rounded shadow-md hover:scale-105 transition-transform" />
+          <img :src="prefixApiResource(getTrackImage(currentTrack))" alt="Album Art" class="w-14 h-14 object-cover rounded shadow-md hover:scale-105 transition-transform" />
         </NuxtLink>
-        <img v-else :src="getResourceUrl(getTrackImage(currentTrack))" alt="Album Art" class="w-14 h-14 object-cover rounded shadow-md" />
+        <img v-else :src="prefixApiResource(getTrackImage(currentTrack))" alt="Album Art" class="w-14 h-14 object-cover rounded shadow-md" />
         
         <div class="flex flex-col min-w-0 justify-center">
           <h3 class="text-sm font-bold truncate">{{ currentTrack.titre }}</h3>
