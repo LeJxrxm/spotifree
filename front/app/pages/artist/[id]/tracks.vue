@@ -2,7 +2,11 @@
 import type { Artiste } from '~/types/Artiste'
 
 const route = useRoute()
-const { data: artist, error } = await useAsyncData<Artiste>(`artist-${route.params.id}`, () => api.get(`/api/artistes/${route.params.id}`))
+const { data: artist, error } = await useAsyncData<Artiste>(`artist-${route.params.id}`, () => api.get(`/api/artistes/${route.params.id}`, {
+    params: {
+        tracks_limit: 500 // Fetch more tracks for the artist page
+    }
+}))
 
 if (error.value) {
     console.error('AsyncData Error:', error.value)
