@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Album;
 use App\Entity\Artiste;
 use App\Entity\Musique;
+use App\Entity\MusiqueUser;
+use App\Entity\User;
 use App\Repository\AlbumRepository;
 use App\Repository\ArtisteRepository;
 use App\Repository\MusiqueRepository;
@@ -14,8 +16,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 class MusiqueController extends AbstractController
 {
     #[Route('/api/musiques', name: 'api_musiques_index', methods: ['GET'])]
@@ -311,6 +317,43 @@ class MusiqueController extends AbstractController
         return $this->json([
             'id' => $musique->getId(),
             'message' => 'Track updated successfully'
+        ]);
+    }
+
+    /**
+     * Allow the user to save their volume preference for a given Musique entity
+     */
+    #[Route('/api/musiques/{id}/volume', name: 'api_musiques_update_volume', methods: ['PATCH'])]
+    public function updateVolume(Musique $musique, Request $request, EntityManagerInterface $entityManager, #[CurrentUser] User $user): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $volume = $data['volume'] ?? null;
+
+
+        if ($volume === null || !is_numeric($volume) || $volume < 0 || $volume > 1) {
+            return $this->json(['message' => 'Invalid volume value. Must be a number between 0 and 1.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Find or create MusiqueUser preference
+        $musiqueUser = $entityManager->getRepository(MusiqueUser::class)->findOneBy([
+            'musique' => $musique,
+            'user' => $user,
+        ]);
+
+        if (!$musiqueUser) {
+            $musiqueUser = new MusiqueUser();
+            $musiqueUser->setMusique($musique);
+            $musiqueUser->setUser($user);
+        }
+
+        $musiqueUser->setVolume($volume);
+        $entityManager->persist($musiqueUser);
+        $entityManager->flush();
+
+        return $this->json([
+            'id' => $musique->getId(),
+            'message' => 'Volume preference saved successfully',
+            'volume' => $volume
         ]);
     }
 }

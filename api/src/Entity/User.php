@@ -53,9 +53,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Musique::class, mappedBy: 'uploader')]
     private Collection $musiques;
 
+    /**
+     * @var Collection<int, MusiqueUser>
+     */
+    #[ORM\OneToMany(targetEntity: MusiqueUser::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $musiqueSettings;
+
     public function __construct()
     {
         $this->musiques = new ArrayCollection();
+        $this->musiqueSettings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -224,6 +231,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($musique->getUploader() === $this) {
                 $musique->setUploader(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MusiqueUser>
+     */
+    public function getMusiqueSettings(): Collection
+    {
+        return $this->musiqueSettings;
+    }
+
+    public function addMusiqueSetting(MusiqueUser $musiqueSetting): static
+    {
+        if (!$this->musiqueSettings->contains($musiqueSetting)) {
+            $this->musiqueSettings->add($musiqueSetting);
+            $musiqueSetting->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMusiqueSetting(MusiqueUser $musiqueSetting): static
+    {
+        if ($this->musiqueSettings->removeElement($musiqueSetting)) {
+            // set the owning side to null (unless already changed)
+            if ($musiqueSetting->getUser() === $this) {
+                $musiqueSetting->setUser(null);
             }
         }
 

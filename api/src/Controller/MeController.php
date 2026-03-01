@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Psr\Log\LoggerInterface;
 
+#[IsGranted('ROLE_USER')]
 #[Route('/api/me', name: 'api_me_')]
 class MeController extends AbstractController
 {
