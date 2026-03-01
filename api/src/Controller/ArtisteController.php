@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Artiste;
 use App\Repository\ArtisteRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,16 +40,15 @@ class ArtisteController extends AbstractController
     }
 
     #[Route('/api/artistes/{id}', name: 'api_artistes_show', methods: ['GET'])]
-    public function show(ArtisteRepository $artisteRepository, int $id): JsonResponse
+    public function show(ArtisteRepository $artisteRepository, Artiste $artiste, Request $request): JsonResponse
     {
-        $artiste = $artisteRepository->find($id);
-
         if (!$artiste) {
             return $this->json(['message' => 'Artist not found'], 404);
         }
 
         // Get popular tracks (for now just take the first 5)
-        $popularTracks = $artiste->getMusiques()->slice(0, 5);
+        $trackLimit = $request->query->get('tracks_limit', 5);
+        $popularTracks = $artiste->getMusiques()->slice(0, $trackLimit);
 
         $tracksData = array_map(function ($track) {
             return [

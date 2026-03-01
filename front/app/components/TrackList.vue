@@ -9,6 +9,8 @@ const props = defineProps<{
     seeMoreText?: string
 }>()
 
+const artist = computed(() => props.tracks[0]?.artiste)
+
 const playerStore = usePlayerStore()
 const { currentTrack, isPlaying } = storeToRefs(playerStore)
 
@@ -75,6 +77,7 @@ const getTrackImage = (track: Musique) => {
         </div>
         <UButton
             v-if="seeMoreText"
+            :to="`/artist/${artist?.id}/tracks`"
             variant="link"
             color="neutral"
             class="mt-4 text-xs font-bold uppercase tracking-wider hover:underline text-gray-500 dark:text-neutral-400 ml-4"
